@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#071f2b" />
+    <meta
+      name="description"
+      content="Local control dashboard for the Automated Fish Tank Feeder."
+    />
+    <title>AquaFeed Control</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="AquaFeed dashboard home">
+        <span class="brand-mark" aria-hidden="true">◉</span>
+        <span>
+          <strong>AquaFeed</strong>
+          <small>Smart aquarium care</small>
+        </span>
+      </a>
+
+      <div class="connection-pill" id="connectionPill" data-state="offline">
+        <span class="status-dot"></span>
+        <span id="connectionLabel">Not connected</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">ESP-01 FEEDER CONTROL</p>
+          <h1>Healthy routines,<br /><span>right on time.</span></h1>
+          <p class="hero-copy">
+            Connect to your feeder, manage two daily portions, and check its
+            latest activity from any device on your local network.
+          </p>
+        </div>
+
+        <div class="device-card glass-panel">
+          <div class="device-visual" aria-hidden="true">
+            <div class="feeder-shell">
+              <div class="food-level"></div>
+              <div class="feeder-window"></div>
+              <div class="feeder-gate"></div>
+            </div>
+            <div class="mount"></div>
+            <div class="bubble bubble-one"></div>
+            <div class="bubble bubble-two"></div>
+            <div class="bubble bubble-three"></div>
+          </div>
+          <div>
+            <span class="mini-label">DEVICE</span>
+            <h2>Automated Fish Feeder</h2>
+            <p id="deviceAddressText">Add the ESP-01 address to begin.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="connection-panel glass-panel" aria-labelledby="connectTitle">
+        <div>
+          <p class="mini-label">LOCAL CONNECTION</p>
+          <h2 id="connectTitle">Connect to your feeder</h2>
+          <p>Enter the IP address printed in the Arduino Serial Monitor.</p>
+        </div>
+        <form id="connectionForm" class="connection-form">
+          <label class="sr-only" for="deviceUrl">ESP-01 device address</label>
+          <input
+            id="deviceUrl"
+            name="deviceUrl"
+            type="url"
+            inputmode="url"
+            placeholder="http://192.168.1.42"
+            autocomplete="url"
+            required
+          />
+          <button class="button button-primary" type="submit">Connect</button>
+        </form>
+      </section>
+
+      <section class="dashboard-grid" aria-live="polite">
+        <article class="status-card glass-panel">
+          <div class="card-heading">
+            <div>
+              <p class="mini-label">LIVE STATUS</p>
+              <h2>Feeder overview</h2>
+            </div>
+            <button class="icon-button" id="refreshButton" type="button" aria-label="Refresh status">
+              ↻
+            </button>
+          </div>
+
+          <dl class="metrics-grid">
+            <div class="metric metric-wide">
+              <dt>Device time</dt>
+              <dd id="deviceTime">—</dd>
+            </div>
+            <div class="metric">
+              <dt>Feeds this session</dt>
+              <dd id="feedCount">—</dd>
+            </div>
+            <div class="metric">
+              <dt>Wi-Fi signal</dt>
+              <dd id="wifiSignal">—</dd>
+            </div>
+            <div class="metric metric-wide">
+              <dt>Last feed</dt>
+              <dd id="lastFeed">No data yet</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="manual-card glass-panel">
+          <p class="mini-label">QUICK ACTION</p>
+          <h2>Feed now</h2>
+          <p>Run one complete dispensing cycle immediately.</p>
+          <button class="feed-button" id="feedButton" type="button">
+            <span class="feed-icon" aria-hidden="true">▶</span>
+            <span>
+              <strong>Dispense food</strong>
+              <small>One measured portion</small>
+            </span>
+          </button>
+        </article>
+
+        <article class="schedule-card glass-panel">
+          <div class="card-heading">
+            <div>
+              <p class="mini-label">AUTOMATION</p>
+              <h2>Daily schedule</h2>
+            </div>
+            <span class="saved-badge" id="savedBadge">Stored on feeder</span>
+          </div>
+
+          <form id="scheduleForm">
+            <div class="schedule-grid">
+              <label class="time-field">
+                <span>Morning feed</span>
+                <input id="schedule1" name="time1" type="time" value="08:00" required />
+              </label>
+              <label class="time-field">
+                <span>Evening feed</span>
+                <input id="schedule2" name="time2" type="time" value="18:00" required />
+              </label>
+            </div>
+            <button class="button button-secondary" type="submit">Save both times</button>
+          </form>
+        </article>
+      </section>
+
+      <p class="network-note">
+        <strong>Local-network dashboard:</strong> your phone or computer must be
+        connected to the same Wi-Fi network as the ESP-01.
+      </p>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

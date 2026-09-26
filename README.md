@@ -53,9 +53,34 @@ The embedded dashboard provides:
 
 The dashboard is intended for use on a trusted local network. It should not be exposed directly to the public internet.
 
+### Custom browser dashboard
+
+A separate responsive interface is included in [`web/`](web/):
+
+- [`web/index.html`](web/index.html) — accessible dashboard structure
+- [`web/styles.css`](web/styles.css) — responsive aquarium-inspired interface
+- [`web/app.js`](web/app.js) — ESP-01 connection, live status, feeding and scheduling
+
+To run it on a computer connected to the same Wi-Fi network as the feeder:
+
+```bash
+cd web
+python3 -m http.server 8080
+```
+
+Open `http://localhost:8080`, enter the ESP-01 address shown in the Arduino Serial Monitor, and select **Connect**.
+
+> Serve the dashboard over ordinary HTTP on the trusted local network. A public HTTPS host such as GitHub Pages cannot normally call an ESP-01's local HTTP address because browsers block mixed-content requests.
+
 ## 💻 Firmware
 
-The Arduino-compatible ESP8266 firmware is available in [`firmware/automated_fish_feeder.ino`](firmware/automated_fish_feeder.ino).
+The Arduino-compatible ESP8266 firmware is available in [`firmware/automated_fish_feeder.ino`](firmware/automated_fish_feeder.ino). It includes both the simple on-device page and JSON endpoints used by the separate dashboard:
+
+| Endpoint | Method | Purpose |
+| --- | --- | --- |
+| `/api/status` | `GET` | Device time, last feed, count, Wi-Fi signal and schedules |
+| `/api/feed` | `POST` | Run one dispensing cycle |
+| `/api/schedule` | `POST` | Save `time1` and `time2` in `HH:MM` format |
 
 Before uploading:
 

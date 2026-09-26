@@ -183,6 +183,70 @@ void handleSchedule() {
   server.send(303, "text/plain", "");
 }
 
+void addCorsHeaders() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.sendHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  server.sendHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
+void handleApiOptions() {
+  addCorsHeaders();
+  server.send(204, "text/plain", "");
+}
+
+void handleApiStatus() {
+  String json = "{";
+  json += "\"online\":true,";
+  json += "\"deviceTime\":\"";
+  json += currentTimeText();
+  json += "\",";
+  json += "\"lastFeed\":\"";
+  json += lastFeedText();
+  json += "\",";
+  json += "\"feedCount\":";
+  json += String(feedCount);
+  json += ",";
+  json += "\"rssi\":";
+  json += String(WiFi.RSSI());
+  json += ",";
+  json += "\"schedule1\":\"";
+  json += scheduleText(settings.hour1, settings.minute1);
+  json += "\",";
+  json += "\"schedule2\":\"";
+  json += scheduleText(settings.hour2, settings.minute2);
+  json += "\"";
+  json += "}";
+
+  addCorsHeaders();
+  server.send(200, "application/json", json);
+}
+
+void handleApiFeed() {
+  dispenseFood("External web dashboard");
+  addCorsHeaders();
+  server.send(200, "application/json", "{\"success\":true,\"message\":\"Feed cycle completed\"}");
+}
+
+void handleApiSchedule() {
+  uint8_t hour1, minute1, hour2, minute2;
+  if (!server.hasArg("time1") || !server.hasArg("time2") ||
+      !parseClockValue(server.arg("time1"), hour1, minute1) ||
+      !parseClockValue(server.arg("time2"), hour2, minute2)) {
+    addCorsHeaders();
+    server.send(400, "application/json", "{\"success\":false,\"message\":\"Invalid schedule\"}");
+    return;
+  }
+
+  settings.hour1 = hour1;
+  settings.minute1 = minute1;
+  settings.hour2 = hour2;
+  settings.minute2 = minute2;
+  saveSettings();
+
+  addCorsHeaders();
+  server.send(200, "application/json", "{\"success\":true,\"message\":\"Schedule saved\"}");
+}
+
 void checkSchedule() {
   time_t now = time(nullptr);
   if (now < 100000) return;
@@ -235,6 +299,12 @@ void setup() {
   server.on("/", HTTP_GET, handleHome);
   server.on("/feed", HTTP_POST, handleManualFeed);
   server.on("/schedule", HTTP_POST, handleSchedule);
+  server.on("/api/status", HTTP_GET, handleApiStatus);
+  server.on("/api/status", HTTP_OPTIONS, handleApiOptions);
+  server.on("/api/feed", HTTP_POST, handleApiFeed);
+  server.on("/api/feed", HTTP_OPTIONS, handleApiOptions);
+  server.on("/api/schedule", HTTP_POST, handleApiSchedule);
+  server.on("/api/schedule", HTTP_OPTIONS, handleApiOptions);
   server.onNotFound([]() { server.send(404, "text/plain", "Not found"); });
   server.begin();
 }
